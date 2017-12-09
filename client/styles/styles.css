@@ -1,5 +1,7 @@
 body {
-    background: #eee;
+    background-color: #eee;
+/*    background: url(images/coffee.jpg) no-repeat center center;
+    background-size: cover;*/
     text-align: center;
     padding: 0 25px;
     font-family: arial, sans-serif;
@@ -17,6 +19,7 @@ body {
 
 #main h1 {
     margin-top: 0;
+    font-family: Futura, Gil Sans, Optima;
     font-size: 35px;
     margin-bottom: 5px;
     padding: 5px;
