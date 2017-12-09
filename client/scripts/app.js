@@ -10,10 +10,11 @@ app.init = function () {
   // $('#send').on('submit', function() {
   app.handleSubmit();
   // });
+  app.fetch();
 };
 
 app.send = function (message) {
-  message.text = JSON.stringify(message.text);
+  // message.text = JSON.stringify(message.text);
   // console.log(JSON.stringify(message));
   // console.log(message);
   $.ajax({
@@ -32,17 +33,31 @@ app.send = function (message) {
   });
 };
 
-app.fetch = function () {
+app.fetch = function (obj) {
+  if (!obj) {
+    var obj = {'order': '-createdAt'};
+  }
+  var arrayOfRooms = [];
+
   $.ajax({
-    url: 'http://parse.sfs.hackreactor.com/chatterbox/classes/messages',
+    url: app.server,
+    data: obj,
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
-      console.log('chatterbox: Message got', data);
+      console.log(data); //JSON.stringify(data.results[0]));
+      data.results.forEach(function(message) {
+        app.renderMessage(message);
+        var room = message.roomname;
+        if (arrayOfRooms.indexOf(room) === -1 && room !== undefined) {
+          arrayOfRooms.push(room);
+          app.renderRoom(room);
+        }
+      });
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-      console.error('chatterbox: Failed to get message', data);
+      console.error(data);
     }
   });
 };
@@ -53,7 +68,7 @@ app.clearMessages = function () {
 
 app.renderMessage = function (message) {
   var username = `<p class="username">${message.username}</p>`;
-  var msg = `<p>${JSON.stringify(message.text)}</p>`;
+  var msg = `<p>${escape(JSON.stringify(message.text))}</p>`;
   var html = `<div class="chat">${username}${msg}</div>`;
   $('#chats').prepend(html);
 };
@@ -69,12 +84,14 @@ app.handleUsernameClick = function (name) {
 
 app.handleSubmit = function () {
   $('#send').on('submit', function() {
-    // app.handleSubmit();
+    console.log(window.location.search);
+    // alert(window.location);
   });
 };
 
 app.server = 'http://parse.sfs.hackreactor.com/chatterbox/classes/messages';
 
+$( document ).ready( app.init() );
 
 // http://parse.sfs.hackreactor.com/chatterbox/classes/messages
 
