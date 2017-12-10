@@ -2,19 +2,19 @@
 var app = {};
 
 app.init = function () {
-  // $('.username').on('click', function() {
-  //   app.handleUsernameClick();
-  // });
-  $('#send').on('click', app.handleSubmit);
+
   app.fetch();
+  
+  $(document).on('click', '.username', function() {
+    // console.log($(this).text());
+    app.handleUsernameClick($(this).text());
+  });
+  
+  $('#send').on('click', app.handleSubmit);
   
   $('#roomSelect').change(app.changeRoom);
   
-  
-  
-  // $('#send').on('submit', function() {
-  //   console.log('this is working')
-  // });
+  $('#makeRoom').on('click', app.createRoom);
   
 };
 
@@ -39,25 +39,12 @@ app.send = function (message) {
 };
 
 
-// app.send = function(message) {
-//   $.ajax({
-//     url: 'http://parse.sfs.hackreactor.com/chatterbox/classes/messages',
-//     type: 'POST',
-//     data: JSON.stringify(message),
-//     contentType: 'application/json',
-//     success: function (data) {
-//     },
-//     error: function (data) {
-//     }
-//   });
-// };
-
 app.fetch = function (obj) {
   //'where' : {'roomname': 'GoT'}
   if (!obj) {
     var obj = {'order': '-createdAt'};
   }
-  var arrayOfRooms = [];
+  var arrayOfRooms = app.currentRooms();
 
   $.ajax({
     url: 'http://parse.sfs.hackreactor.com/chatterbox/classes/messages',
@@ -88,7 +75,7 @@ app.clearMessages = function () {
 
 app.renderMessage = function (message) {
   var username = `<p class="username">${message.username}</p>`;
-  var msg = `<p>${escape(JSON.stringify(message.text))}</p>`;
+  var msg = `<p>${(JSON.stringify(message.text))}</p>`;
   var html = `<div class="chat">${username}${msg}</div>`;
   $('#chats').append(html);
 };
@@ -98,6 +85,14 @@ app.renderRoom = function (roomName) {
   $('#roomSelect').append(html);
 };
 
+app.currentRooms = function() {
+  var currRooms = [];
+  $('#roomSelect option').each(function() {
+    currRooms.push($(this).val());
+  });
+  return currRooms;
+};
+
 app.changeRoom = function () {
   var roomSelect = $('#roomSelect').val();
   var obj = {'order': '-createdAt', 'where': {'roomname': `${roomSelect}`}};
@@ -105,8 +100,20 @@ app.changeRoom = function () {
   app.fetch(obj);
 };
 
+app.createRoom = function() {
+  var roomCreate = $('#newRoomName').val();
+  var obj = {'order': '-createdAt', 'where': {'roomname': `${newRoomName}`}};
+  app.clearMessages();
+  app.fetch(obj);
+  app.renderRoom(roomCreate);
+  $('#roomSelect').val(roomCreate);
+};
+
 app.handleUsernameClick = function (name) {
   //do something with name
+  var obj = {'order': '-createdAt', 'where': {'username': `${name}`}};
+  app.clearMessages();
+  app.fetch(obj);
 };
 
 app.handleSubmit = function () {
