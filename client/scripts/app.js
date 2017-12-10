@@ -8,6 +8,10 @@ app.init = function () {
   $('#send').on('click', app.handleSubmit);
   app.fetch();
   
+  $('#roomSelect').change(app.changeRoom);
+  
+  
+  
   // $('#send').on('submit', function() {
   //   console.log('this is working')
   // });
@@ -94,6 +98,13 @@ app.renderRoom = function (roomName) {
   $('#roomSelect').append(html);
 };
 
+app.changeRoom = function () {
+  var roomSelect = $('#roomSelect').val();
+  var obj = {'order': '-createdAt', 'where': {'roomname': `${roomSelect}`}};
+  app.clearMessages();
+  app.fetch(obj);
+};
+
 app.handleUsernameClick = function (name) {
   //do something with name
 };
@@ -109,7 +120,7 @@ app.handleSubmit = function () {
 
 app.server = 'http://parse.sfs.hackreactor.com/chatterbox/classes/messages';
 
-$( document ).ready( app.init );
+$(document).ready(app.init);
 
 // http://parse.sfs.hackreactor.com/chatterbox/classes/messages
 
